@@ -1,0 +1,98 @@
+import javax.xml.transform.Result;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Введите строку и подстроку каждую в двойных кавычках и операнд между ними -, /, *, + ");
+        String strSum = scanner.nextLine();
+
+        String regex = "^ *\"([^\"]*?)\" *(?:([-+]) *\"([^\"]*?)\"|([/*]) *(\\d+?)) *$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(strSum);
+        boolean found = matcher.find();
+        if (!found) {
+            throw new IllegalArgumentException(" Ошибка Выражения !");
+        }
+
+        String[] members = parseStr(matcher);
+        String result = "";
+        switch (members[1]) {
+            case "+":
+                result = sumStr(members);
+                break;
+            case "-":
+                result = diffStr(members);
+                break;
+            case "/":
+                result = divStr(members);
+                break;
+            case "*":
+                result = multStr(members);
+        }
+        System.out.println("\"" + result + "\"");
+
+
+    }
+
+    private static String multStr(String[] members) {
+        String result = "";
+        int counter = Integer.parseInt(members[2]);
+        for (int i = 0; i < counter; i++) {
+            result = result.concat(members[0]);
+        }
+        return result;
+    }
+
+    private static String diffStr(String[] members) {
+        return members[0].replaceAll(members[2], "");
+    }
+
+    private static String sumStr(String[] members) {
+        return members[0].concat(members[2]);
+    }
+    private static String divStr(String[] members) {
+
+        String result = "";
+        int lengthStr = (members[0].length());
+        int number = Integer.parseInt(members[2]);
+        int r = lengthStr / number;
+        result = members[0].substring(0,r);
+        return result;
+    }
+
+
+    private static String[] parseStr(Matcher matcher) {
+        int counter = matcher.groupCount();
+        String[] members = new String[3];
+        int offset = 0;
+        for (int i = 1; i <= counter; i++) {
+            String local = matcher.group(i);
+            if (local != null) {
+                members[offset] = local;
+                offset++;
+            }
+
+        }
+
+        return members;
+    }
+
+
+
+
+}
+
+
+// "super" + "mario"
+// "super" - "mario"
+// "super mario" - "mario"
+// "super" * 3
+// "super mario"  / 3
+
+
+
+
